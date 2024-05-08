@@ -4,7 +4,7 @@ import pandas as pd
 from .catalog_generator import generate_data_catalog
 from .utils import load_definitions, generate_initial_yaml
 
-def run_server(df, path_to_yaml='definitions.yaml'):
+def edit_definitions(df, path_to_yaml='definitions.yaml'):
     app = Dash(__name__)
     if path_to_yaml:
         definitions = load_definitions(path_to_yaml)
