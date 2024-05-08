@@ -13,7 +13,7 @@ def edit_definitions(df, path_to_yaml='definitions.yaml'):
         generate_initial_yaml(df, 'definitions.yaml')
         definitions = load_definitions('definitions.yaml')
 
-    catalog_df = generate_data_catalog(df, definitions)
+    catalog_df = generate_data_catalog(df, path_to_yaml, output_type='df')
 
     app.layout = html.Div([
         dash_table.DataTable(
