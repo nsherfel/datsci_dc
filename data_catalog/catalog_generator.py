@@ -21,19 +21,20 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
             "Definition": definitions.get(column, {}).get("definition", "No definition provided"),
             "Example Values": column_info['examples'],
             "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%",
-            "Statistics": column_info.get('statistics', 'N/A')
+            "Statistics": ', '.join([v for k, v in column_info.items() if k != 'examples'])
         }
-        
         catalog.append(data)
     
     catalog_df = pd.DataFrame(catalog)
 
+    # Ensure that the DataFrame is returned by default
     if output_type == 'markdown':
         return catalog_df.to_markdown(index=False)
     elif output_type == 'csv':
         return catalog_df.to_csv(index=False)
     elif output_type == 'df':
-        return catalog_df  # Ensure this is the default or handled case
+        return catalog_df  # This line ensures a DataFrame is returned
     else:
         raise ValueError("Unsupported output type. Use 'markdown', 'csv', or 'df'.")
+
 
