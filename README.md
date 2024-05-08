@@ -23,9 +23,10 @@ This repository includes a Python module, `data_catalog`, that simplifies the cr
      ```
 
 3. **Generate/Edit YAML File:**
-   - The `generate_data_catalog` function reads your dataset and either creates a new YAML file or updates an existing one. This YAML file stores metadata definitions and can be edited directly or through an interactive table (`edit_definitions`).
+   - The `generate_data_catalog` function reads your dataset and generates a YAML file. You can specify a custom name for the YAML file using the `path_to_yaml` parameter. If not specified, a default file named `data_definitions.yaml` is used or created.
      ```python
-     catalog = generate_data_catalog(pd.read_csv('./dataset.csv'), path_to_yaml='data_definitions.yaml', output_type='markdown')
+     df = pd.read_csv('./dataset.csv')
+     catalog = generate_data_catalog(df, path_to_yaml='custom_definitions.yaml', output_type='markdown')
      ```
 
 4. **View and Edit Metadata:**
@@ -45,8 +46,5 @@ This repository includes a Python module, `data_catalog`, that simplifies the cr
 
 ## Additional Notes
 
-- If the path to the YAML file is not defined, the system will create a default `data_definitions.yaml` file. If this file already exists, it will be used by default.
+- The default YAML file, if not specified, will be named `data_definitions.yaml`. You can specify a custom file name using the `path_to_yaml` parameter.
 - The YAML file serves as a central definition store that can be revised through the `edit_definitions` interface, and these revisions are reflected when generating new outputs.
-
-This README now includes a dedicated installation step, helping users to set up the module seamlessly.
-
