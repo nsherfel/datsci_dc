@@ -5,13 +5,13 @@ import os
 from .catalog_generator import generate_data_catalog
 from .utils import load_definitions, generate_initial_yaml
 
-def edit_definitions(df, path_to_yaml='definitions.yaml'):
+def edit_definitions(df, path_to_yaml=None):
     app = Dash(__name__)
     if path_to_yaml:
         definitions = load_definitions(path_to_yaml)
     else:
-        generate_initial_yaml(df, 'definitions.yaml')
-        definitions = load_definitions('definitions.yaml')
+        generate_initial_yaml(df, 'data_definitions.yaml')
+        definitions = load_definitions('data_definitions.yaml')
 
     catalog_df = generate_data_catalog(df, path_to_yaml, output_type='df')
 
