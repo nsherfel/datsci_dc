@@ -21,10 +21,16 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
             "Example Values": column_info['examples'],
             "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%"
         }
+        
+        # Combine Range and Number of Categories into one column
         if 'categories' in column_info:
-            data["Number of Categories"] = column_info['categories']
+            data["Statistics"] = f"Categories: {column_info['categories']}"
         if 'range' in column_info:
-            data["Range"] = f"{column_info['range'][0]} to {column_info['range'][1]}"
+            if "Statistics" in data:
+                data["Statistics"] += f", Range: {column_info['range'][0]} to {column_info['range'][1]}"
+            else:
+                data["Statistics"] = f"Range: {column_info['range'][0]} to {column_info['range'][1]}"
+        
         catalog.append(data)
     
     catalog_df = pd.DataFrame(catalog)
@@ -35,4 +41,5 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
         return catalog_df.to_csv(index=False)
     else:
         raise ValueError("Unsupported output type. Use 'markdown' or 'csv'.")
+
 
