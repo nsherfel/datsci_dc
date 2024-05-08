@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from .utils import load_definitions, get_example_values, generate_initial_yaml
 
 def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
