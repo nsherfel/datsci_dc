@@ -12,26 +12,29 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
 
     catalog = []
     for column in df.columns:
-        column_info = get_example_values(df[column])
+        example_values = get_example_values(df[column])
+        column_info = get_column_info(df[column])
         data = {
             "Field Name": column,
             "Data Type": str(df[column].dtype),
             "Source": definitions.get(column, {}).get("source", "TBD"),
             "Definition": definitions.get(column, {}).get("definition", "No definition provided"),
-            "Example Values": column_info['examples'],
-            "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%"
+            "Example Values": example_values,
+            "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%",
+            "Statistics": column_info
         }
         
-        # Combine Range and Number of Categories into one column
-        if 'categories' in column_info:
-            data["Statistics"] = f"Categories: {column_info['categories']}"
-        if 'range' in column_info:
-            if "Statistics" in data:
-                data["Statistics"] += f", Range: {column_info['range'][0]} to {column_info['range'][1]}"
-            else:
-                data["Statistics"] = f"Range: {column_info['range'][0]} to {column_info['range'][1]}"
-        
         catalog.append(data)
+    
+    catalog_df = pd.DataFrame(catalog)
+
+    if output_type == 'markdown':
+        return catalog_df.to_markdown(index=False)
+    elif output_type == 'csv':
+        return catalog_df.to_csv(index=False)
+    else:
+        raise ValueError("Unsupported output type. Use 'markdown' or 'csv'.")
+
     
     catalog_df = pd.DataFrame(catalog)
 
