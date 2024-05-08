@@ -1,6 +1,7 @@
 from dash import Dash, html, dcc, dash_table
 from dash.dependencies import Input, Output, State
 import pandas as pd
+import os
 from .catalog_generator import generate_data_catalog
 from .utils import load_definitions, generate_initial_yaml
 
