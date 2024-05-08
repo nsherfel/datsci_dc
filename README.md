@@ -1,6 +1,6 @@
 # Data Catalog Management
 
-This repository includes a Python module, `data_catalog`, that simplifies the creation and management of data catalogs for datasets, particularly useful in data analysis and machine learning projects.
+This repository includes a Python module, `data_catalog`, that simplifies the creation and management of data catalogs for datasets, particularly useful in the initial phases of data analysis and machine learning projects.
 
 ## Features
 
