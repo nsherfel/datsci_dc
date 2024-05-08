@@ -21,5 +21,5 @@ setup(
     description='An interactive data cataloging tool for internal use.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='[]',
+    url='https://github.com/nsherfel/tds-datsci-data-catalog.git',
 )
