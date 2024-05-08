@@ -1,5 +1,6 @@
 import yaml
 import os
+import pandas as pd
 
 def load_definitions(path_to_yaml):
     if os.path.exists(path_to_yaml):
