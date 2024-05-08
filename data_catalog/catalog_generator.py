@@ -1,7 +1,7 @@
 import pandas as pd
 from .utils import load_definitions, get_example_values, generate_initial_yaml
 
-def generate_data_catalog(df, path_to_yaml=None):
+def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
     if path_to_yaml and not os.path.exists(path_to_yaml):
         generate_initial_yaml(df, path_to_yaml)
     elif not path_to_yaml:
@@ -26,4 +26,13 @@ def generate_data_catalog(df, path_to_yaml=None):
         if 'range' in column_info:
             data["Range"] = f"{column_info['range'][0]} to {column_info['range'][1]}"
         catalog.append(data)
-    return pd.DataFrame(catalog)
+    
+    catalog_df = pd.DataFrame(catalog)
+
+    if output_type == 'markdown':
+        return catalog_df.to_markdown(index=False)
+    elif output_type == 'csv':
+        return catalog_df.to_csv(index=False)
+    else:
+        raise ValueError("Unsupported output type. Use 'markdown' or 'csv'.")
+
