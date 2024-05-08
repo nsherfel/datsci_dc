@@ -21,8 +21,7 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
             "Definition": definitions.get(column, {}).get("definition", "No definition provided"),
             "Example Values": column_info['examples'],
             "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%",
-            "Statistics": ', '.join([v for k, v in column_info.items() if k != 'examples'])
-        }
+            "Statistics": ', '.join([f"{k}: {', '.join(map(str, v))}" if isinstance(v, tuple) else f"{k}: {v}" for k, v in column_info.items() if k != 'examples'])        }
         catalog.append(data)
     
     catalog_df = pd.DataFrame(catalog)
