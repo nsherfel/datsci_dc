@@ -28,11 +28,11 @@ This repository includes a Python module, `data_catalog`, that simplifies the cr
      df = pd.read_csv('./dataset.csv')
      catalog = generate_data_catalog(df, path_to_yaml='custom_definitions.yaml', output_type='markdown')
      ```
-![Markdown Output Example](/images/markdown_output.png "Markdown Output Example")
+
+![Edit Definitions Interface](/images/edit_definitions.png "Edit Definitions Interface")
 
 4. **View and Edit Metadata:**
    - Use the interactive `edit_definitions` table to easily modify metadata definitions. This tool provides a user-friendly interface to manage the details without directly editing the YAML file.
-![Edit Definitions Interface](/images/edit_definitions.png "Edit Definitions Interface")
 
 5. **Generate Catalog for Documentation:**
    - Convert the YAML metadata into a markdown format to include in your project's README or documentation, facilitating easy understanding and reference:
