@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from .utils import load_definitions, get_example_values, generate_initial_yaml
 
-def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
+def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
     if path_to_yaml and not os.path.exists(path_to_yaml):
         generate_initial_yaml(df, path_to_yaml)
     elif not path_to_yaml:
@@ -20,16 +20,9 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
             "Source": definitions.get(column, {}).get("source", "TBD"),
             "Definition": definitions.get(column, {}).get("definition", "No definition provided"),
             "Example Values": column_info['examples'],
-            "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%"
+            "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%",
+            "Statistics": column_info.get('statistics', 'N/A')
         }
-        
-        # Combining range and categories into a single Statistics field
-        stats_details = []
-        if 'categories' in column_info:
-            stats_details.append(f"Categories: {column_info['categories']}")
-        if 'range' in column_info:
-            stats_details.append(f"Range: {column_info['range'][0]} to {column_info['range'][1]}")
-        data["Statistics"] = ', '.join(stats_details)
         
         catalog.append(data)
     
@@ -39,5 +32,8 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='csv'):
         return catalog_df.to_markdown(index=False)
     elif output_type == 'csv':
         return catalog_df.to_csv(index=False)
+    elif output_type == 'df':
+        return catalog_df  # Ensure this is the default or handled case
     else:
-        raise ValueError("Unsupported output type. Use 'markdown' or 'csv'.")
+        raise ValueError("Unsupported output type. Use 'markdown', 'csv', or 'df'.")
+
