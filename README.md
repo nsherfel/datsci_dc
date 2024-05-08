@@ -29,6 +29,8 @@ This repository includes a Python module, `data_catalog`, that simplifies the cr
      catalog = generate_data_catalog(df, path_to_yaml='custom_definitions.yaml', output_type='markdown')
      ```
 
+![Edit Definitions Interface](/images/edit_definitions.png "Edit Definitions Interface")
+
 4. **View and Edit Metadata:**
    - Use the interactive `edit_definitions` table to easily modify metadata definitions. This tool provides a user-friendly interface to manage the details without directly editing the YAML file.
 
