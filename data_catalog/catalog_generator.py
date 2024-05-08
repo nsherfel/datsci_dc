@@ -6,7 +6,7 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
     if path_to_yaml and not os.path.exists(path_to_yaml):
         generate_initial_yaml(df, path_to_yaml)
     elif not path_to_yaml:
-        path_to_yaml = 'default_definitions.yaml'
+        path_to_yaml = 'data_definitions.yaml'
         generate_initial_yaml(df, path_to_yaml)
 
     definitions = load_definitions(path_to_yaml)
