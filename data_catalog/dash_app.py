@@ -16,14 +16,15 @@ def edit_definitions(df, path_to_yaml=None):
     
     catalog_df = generate_data_catalog(df, path_to_yaml, output_type='df')
     
-    # Add the new "Priority" column
-    catalog_df['Priority'] = '1'
+    # Remove duplicate columns and the Priority column
+    columns_to_keep = ['Field Name', 'Data Type', 'Source', 'Definition', 'Status', 'Example Values', 'Percent Null', 'Statistics']
+    catalog_df = catalog_df[columns_to_keep]
     
     app.layout = html.Div([
         dash_table.DataTable(
             id='data-catalog-table',
             columns=[
-                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition', 'Status', 'Priority'] else False}
+                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition', 'Status'] else False}
                 for i in catalog_df.columns
             ] + [{"name": "New Column", "id": "new_column", "editable": True}],
             data=catalog_df.to_dict('records'),
@@ -38,12 +39,6 @@ def edit_definitions(df, path_to_yaml=None):
                         for i in ['to be added', 'added', 'removed']
                     ]
                 },
-                'Priority': {
-                    'options': [
-                        {'label': str(i), 'value': str(i)}
-                        for i in [1, 2, 3]
-                    ]
-                }
             }
         ),
         html.Button('Add Column', id='add-column-button', n_clicks=0),
@@ -76,12 +71,11 @@ def edit_definitions(df, path_to_yaml=None):
                 new_definitions[field_name] = {
                     'source': row['Source'],
                     'definition': row['Definition'],
-                    'status': row['Status'],
-                    'priority': row['Priority']
+                    'status': row['Status']
                 }
                 # Add any additional columns
                 for col in columns:
-                    if col['name'] not in ['Field Name', 'Source', 'Definition', 'Status', 'Priority', 'Data Type', 'Example Values', 'Percent Null', 'Statistics']:
+                    if col['name'] not in ['Field Name', 'Data Type', 'Source', 'Definition', 'Status', 'Example Values', 'Percent Null', 'Statistics']:
                         new_definitions[field_name][col['name']] = row.get(col['id'], '')
             
             with open(path_to_yaml, 'w') as file:
