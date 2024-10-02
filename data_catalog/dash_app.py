@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, dash_table
+from dash import Dash, html, dcc, dash_table, callback_context
 from dash.dependencies import Input, Output, State
 import pandas as pd
 import yaml
@@ -65,33 +65,32 @@ def edit_definitions(df, path_to_yaml=None):
 
     @app.callback(
         Output('data-catalog-table', 'data'),
+        Output('data-catalog-table', 'columns'),
         Input('add-row-button', 'n_clicks'),
+        Input('add-column-button', 'n_clicks'),
         State('data-catalog-table', 'data'),
         State('data-catalog-table', 'columns'),
-        State('new-field-name', 'value')
+        State('new-field-name', 'value'),
+        State('new-column-name', 'value')
     )
-    def add_row(n_clicks, rows, columns, new_field_name):
-        if n_clicks > 0 and new_field_name:
+    def update_table(add_row_clicks, add_column_clicks, rows, columns, new_field_name, new_column_name):
+        ctx = callback_context
+        if not ctx.triggered:
+            return rows, columns
+        
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        
+        if button_id == 'add-row-button' and new_field_name:
             new_row = {col['id']: '' for col in columns}
             new_row['Field Name'] = new_field_name
             new_row['Status'] = 'to be added'
             rows.append(new_row)
-        return rows
-
-    @app.callback(
-        Output('data-catalog-table', 'columns'),
-        Output('data-catalog-table', 'data'),
-        Input('add-column-button', 'n_clicks'),
-        State('data-catalog-table', 'columns'),
-        State('data-catalog-table', 'data'),
-        State('new-column-name', 'value')
-    )
-    def add_column(n_clicks, existing_columns, existing_data, new_column_name):
-        if n_clicks > 0 and new_column_name:
-            existing_columns.append({"name": new_column_name, "id": new_column_name, "editable": True})
-            for row in existing_data:
+        elif button_id == 'add-column-button' and new_column_name:
+            columns.append({"name": new_column_name, "id": new_column_name, "editable": True})
+            for row in rows:
                 row[new_column_name] = ''
-        return existing_columns, existing_data
+        
+        return rows, columns
 
     @app.callback(
         Output('save-confirm', 'children'),
