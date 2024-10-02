@@ -2,8 +2,8 @@ from dash import Dash, html, dcc, dash_table
 from dash.dependencies import Input, Output, State
 import pandas as pd
 import yaml
-from catalog_generator import generate_data_catalog
-from utils import load_definitions, generate_initial_yaml, update_yaml_with_status
+from data_catalog.catalog_generator import generate_data_catalog
+from data_catalog.utils import load_definitions, generate_initial_yaml, update_yaml_with_status
 
 def edit_definitions(df, path_to_yaml=None):
     app = Dash(__name__)
