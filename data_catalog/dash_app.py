@@ -26,12 +26,12 @@ def edit_definitions(df, path_to_yaml=None):
             columns=[
                 {"name": i, "id": i, "editable": True if i in ['Source', 'Definition', 'Status'] else False}
                 for i in catalog_df.columns
-            ] + [{"name": "New Column", "id": "new_column", "editable": True}],
+            ],
             data=catalog_df.to_dict('records'),
             editable=True,
             filter_action="native",
             sort_action="native",
-            row_deletable=True,
+            row_deletable=False,
             dropdown={
                 'Status': {
                     'options': [
