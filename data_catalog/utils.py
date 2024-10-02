@@ -1,6 +1,5 @@
 import yaml
 import os
-import pandas as pd
 
 def load_definitions(path_to_yaml):
     if os.path.exists(path_to_yaml):
@@ -20,6 +19,20 @@ def generate_initial_yaml(df, path_to_yaml):
                     "status": "added"
                 } for col in df.columns
             }, file)
+
+def update_yaml_with_status(path_to_yaml):
+    with open(path_to_yaml, 'r') as file:
+        definitions = yaml.safe_load(file)
+    
+    updated = False
+    for field, info in definitions.items():
+        if 'status' not in info:
+            info['status'] = 'added'
+            updated = True
+    
+    if updated:
+        with open(path_to_yaml, 'w') as file:
+            yaml.safe_dump(definitions, file)
 
 def get_example_values(column):
     info = {}
