@@ -21,12 +21,17 @@ def edit_definitions(df, path_to_yaml=None):
     columns_to_keep = ['Field Name', 'Data Type', 'Source', 'Definition', 'Status', 'Example Values', 'Percent Null', 'Statistics']
     catalog_df = catalog_df[columns_to_keep]
     
+    # Set default value for Status if it's empty
+    catalog_df['Status'] = catalog_df['Status'].fillna('to be added')
+
     app.layout = html.Div([
         dash_table.DataTable(
             id='data-catalog-table',
             columns=[
-                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition', 'Status'] else False}
-                for i in catalog_df.columns
+                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition'] else False}
+                for i in catalog_df.columns if i != 'Status'
+            ] + [
+                {"name": "Status", "id": "Status", "presentation": "dropdown"}
             ],
             data=catalog_df.to_dict('records'),
             editable=True,
@@ -40,7 +45,11 @@ def edit_definitions(df, path_to_yaml=None):
                         for i in ['to be added', 'added', 'removed']
                     ]
                 },
-            }
+            },
+            css=[{
+                'selector': '.Select-menu-outer',
+                'rule': 'display: block !important'
+            }]
         ),
         html.Div([
             dcc.Input(id='new-column-name', type='text', placeholder='Enter new column name'),
