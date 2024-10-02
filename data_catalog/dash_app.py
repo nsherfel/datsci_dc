@@ -3,34 +3,25 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 import yaml
 from catalog_generator import generate_data_catalog
-from utils import load_definitions, generate_initial_yaml
+from utils import load_definitions, generate_initial_yaml, update_yaml_with_status
 
 def edit_definitions(df, path_to_yaml=None):
     app = Dash(__name__)
     if path_to_yaml:
         definitions = load_definitions(path_to_yaml)
+        update_yaml_with_status(path_to_yaml)  # Update existing YAML with Status field
     else:
         generate_initial_yaml(df, 'data_definitions.yaml')
         definitions = load_definitions('data_definitions.yaml')
     
     catalog_df = generate_data_catalog(df, path_to_yaml, output_type='df')
     
-    # Add the Status column if it doesn't exist
-    if 'Status' not in catalog_df.columns:
-        catalog_df['Status'] = 'added'
-    
     app.layout = html.Div([
         dash_table.DataTable(
             id='data-catalog-table',
             columns=[
-                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition'] else False}
-                for i in catalog_df.columns if i != 'Status'
-            ] + [
-                {
-                    "name": "Status",
-                    "id": "Status",
-                    "presentation": "dropdown"
-                }
+                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition', 'Status'] else False}
+                for i in catalog_df.columns
             ],
             data=catalog_df.to_dict('records'),
             editable=True,
