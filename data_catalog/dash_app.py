@@ -7,6 +7,8 @@ from data_catalog.utils import load_definitions, generate_initial_yaml, update_y
 
 def edit_definitions(df, path_to_yaml=None):
     app = Dash(__name__)
+    app.config.suppress_callback_exceptions = True  # This can help with callback issues
+
     if path_to_yaml:
         definitions = load_definitions(path_to_yaml)
         update_yaml_with_status(path_to_yaml)  # Update existing YAML with Status field
@@ -51,14 +53,18 @@ def edit_definitions(df, path_to_yaml=None):
 
     @app.callback(
         Output('data-catalog-table', 'columns'),
+        Output('data-catalog-table', 'data'),
         Input('add-column-button', 'n_clicks'),
         State('data-catalog-table', 'columns'),
+        State('data-catalog-table', 'data'),
         State('new-column-name', 'value')
     )
-    def add_column(n_clicks, existing_columns, new_column_name):
+    def add_column(n_clicks, existing_columns, existing_data, new_column_name):
         if n_clicks > 0 and new_column_name:
             existing_columns.append({"name": new_column_name, "id": new_column_name, "editable": True})
-        return existing_columns
+            for row in existing_data:
+                row[new_column_name] = ''  # Initialize with empty string
+        return existing_columns, existing_data
 
     @app.callback(
         Output('save-confirm', 'children'),
@@ -76,9 +82,9 @@ def edit_definitions(df, path_to_yaml=None):
                     'definition': row['Definition'],
                     'status': row['Status']
                 }
-                # Add any additional columns
+                # Add all columns, including new ones
                 for col in columns:
-                    if col['name'] not in ['Field Name', 'Data Type', 'Source', 'Definition', 'Status', 'Example Values', 'Percent Null', 'Statistics']:
+                    if col['name'] not in ['Field Name', 'Data Type', 'Example Values', 'Percent Null', 'Statistics']:
                         new_definitions[field_name][col['name']] = row.get(col['id'], '')
             
             with open(path_to_yaml, 'w') as file:
@@ -86,4 +92,4 @@ def edit_definitions(df, path_to_yaml=None):
             return 'Changes saved!'
         return ''
 
-    app.run_server(debug=True)
+    app.run_server(debug=False)  # Set debug to False to remove the dev bubble
