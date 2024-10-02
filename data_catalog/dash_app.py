@@ -28,7 +28,7 @@ def edit_definitions(df, path_to_yaml=None):
         dash_table.DataTable(
             id='data-catalog-table',
             columns=[
-                {"name": i, "id": i, "editable": True if i in ['Source', 'Definition'] else False}
+                {"name": i, "id": i, "editable": True if i in ['Field Name', 'Source', 'Definition'] else False}
                 for i in catalog_df.columns if i != 'Status'
             ] + [
                 {"name": "Status", "id": "Status", "presentation": "dropdown"}
@@ -37,7 +37,7 @@ def edit_definitions(df, path_to_yaml=None):
             editable=True,
             filter_action="native",
             sort_action="native",
-            row_deletable=False,
+            row_deletable=True,
             dropdown={
                 'Status': {
                     'options': [
@@ -52,12 +52,31 @@ def edit_definitions(df, path_to_yaml=None):
             }]
         ),
         html.Div([
+            dcc.Input(id='new-field-name', type='text', placeholder='Enter new field name'),
+            html.Button('Add Row', id='add-row-button', n_clicks=0),
+        ]),
+        html.Div([
             dcc.Input(id='new-column-name', type='text', placeholder='Enter new column name'),
             html.Button('Add Column', id='add-column-button', n_clicks=0),
         ]),
         html.Button('Save Changes', id='save-button', n_clicks=0),
         html.Div(id='save-confirm')
     ])
+
+    @app.callback(
+        Output('data-catalog-table', 'data'),
+        Input('add-row-button', 'n_clicks'),
+        State('data-catalog-table', 'data'),
+        State('data-catalog-table', 'columns'),
+        State('new-field-name', 'value')
+    )
+    def add_row(n_clicks, rows, columns, new_field_name):
+        if n_clicks > 0 and new_field_name:
+            new_row = {col['id']: '' for col in columns}
+            new_row['Field Name'] = new_field_name
+            new_row['Status'] = 'to be added'
+            rows.append(new_row)
+        return rows
 
     @app.callback(
         Output('data-catalog-table', 'columns'),
