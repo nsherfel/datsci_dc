@@ -17,8 +17,7 @@ def generate_initial_yaml(df, path_to_yaml):
                 col: {
                     "source": "TBD",
                     "definition": "No definition provided",
-                    "status": "added",
-                    "priority": "1"
+                    "status": "added"
                 } for col in df.columns
             }, file)
 
@@ -30,9 +29,6 @@ def update_yaml_with_status(path_to_yaml):
     for field, info in definitions.items():
         if 'status' not in info:
             info['status'] = 'added'
-            updated = True
-        if 'priority' not in info:
-            info['priority'] = '1'
             updated = True
     
     if updated:
