@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from utils import load_definitions, get_example_values, generate_initial_yaml
 
 def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
@@ -21,8 +22,13 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
             "Example Values": column_info['examples'],
             "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%",
             "Statistics": ', '.join([f"{k}: {', '.join(map(str, v))}" if isinstance(v, tuple) else f"{k}: {v}" for k, v in column_info.items() if k != 'examples']),
-            "Status": definitions.get(column, {}).get("status", "added")
+            "Status": definitions.get(column, {}).get("status", "added"),
+            "Priority": definitions.get(column, {}).get("priority", "1")
         }
+        # Add any additional custom fields from the YAML file
+        for key, value in definitions.get(column, {}).items():
+            if key not in data:
+                data[key] = value
         catalog.append(data)
     
     catalog_df = pd.DataFrame(catalog)
