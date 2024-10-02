@@ -7,18 +7,17 @@ from data_catalog.utils import load_definitions, generate_initial_yaml, update_y
 
 def edit_definitions(df, path_to_yaml=None):
     app = Dash(__name__)
-    app.config.suppress_callback_exceptions = True  # This can help with callback issues
+    app.config.suppress_callback_exceptions = True
 
     if path_to_yaml:
         definitions = load_definitions(path_to_yaml)
-        update_yaml_with_status(path_to_yaml)  # Update existing YAML with Status field
+        update_yaml_with_status(path_to_yaml)
     else:
         generate_initial_yaml(df, 'data_definitions.yaml')
         definitions = load_definitions('data_definitions.yaml')
     
     catalog_df = generate_data_catalog(df, path_to_yaml, output_type='df')
     
-    # Remove duplicate columns and the Priority column
     columns_to_keep = ['Field Name', 'Data Type', 'Source', 'Definition', 'Status', 'Example Values', 'Percent Null', 'Statistics']
     catalog_df = catalog_df[columns_to_keep]
     
@@ -63,7 +62,7 @@ def edit_definitions(df, path_to_yaml=None):
         if n_clicks > 0 and new_column_name:
             existing_columns.append({"name": new_column_name, "id": new_column_name, "editable": True})
             for row in existing_data:
-                row[new_column_name] = ''  # Initialize with empty string
+                row[new_column_name] = ''
         return existing_columns, existing_data
 
     @app.callback(
@@ -77,19 +76,16 @@ def edit_definitions(df, path_to_yaml=None):
             new_definitions = {}
             for row in rows:
                 field_name = row['Field Name']
-                new_definitions[field_name] = {
-                    'source': row['Source'],
-                    'definition': row['Definition'],
-                    'status': row['Status']
-                }
-                # Add all columns, including new ones
+                new_definitions[field_name] = {}
                 for col in columns:
                     if col['name'] not in ['Field Name', 'Data Type', 'Example Values', 'Percent Null', 'Statistics']:
-                        new_definitions[field_name][col['name']] = row.get(col['id'], '')
+                        # Use lowercase keys for consistency
+                        key = col['name'].lower()
+                        new_definitions[field_name][key] = row.get(col['id'], '')
             
             with open(path_to_yaml, 'w') as file:
                 yaml.safe_dump(new_definitions, file)
             return 'Changes saved!'
         return ''
 
-    app.run_server(debug=False)  # Set debug to False to remove the dev bubble
+    app.run_server(debug=False)
