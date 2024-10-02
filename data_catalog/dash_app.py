@@ -41,7 +41,10 @@ def edit_definitions(df, path_to_yaml=None):
                 },
             }
         ),
-        html.Button('Add Column', id='add-column-button', n_clicks=0),
+        html.Div([
+            dcc.Input(id='new-column-name', type='text', placeholder='Enter new column name'),
+            html.Button('Add Column', id='add-column-button', n_clicks=0),
+        ]),
         html.Button('Save Changes', id='save-button', n_clicks=0),
         html.Div(id='save-confirm')
     ])
@@ -49,11 +52,11 @@ def edit_definitions(df, path_to_yaml=None):
     @app.callback(
         Output('data-catalog-table', 'columns'),
         Input('add-column-button', 'n_clicks'),
-        State('data-catalog-table', 'columns')
+        State('data-catalog-table', 'columns'),
+        State('new-column-name', 'value')
     )
-    def add_column(n_clicks, existing_columns):
-        if n_clicks > 0:
-            new_column_name = f"New Column {n_clicks}"
+    def add_column(n_clicks, existing_columns, new_column_name):
+        if n_clicks > 0 and new_column_name:
             existing_columns.append({"name": new_column_name, "id": new_column_name, "editable": True})
         return existing_columns
 
