@@ -26,7 +26,7 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
         }
         # Add any additional custom fields from the YAML file
         for key, value in definitions.get(column, {}).items():
-            if key not in data:
+            if key.lower() not in [k.lower() for k in data.keys()]:
                 data[key] = value
         catalog.append(data)
     
