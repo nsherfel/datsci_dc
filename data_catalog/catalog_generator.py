@@ -22,8 +22,7 @@ def generate_data_catalog(df, path_to_yaml=None, output_type='df'):
             "Example Values": column_info['examples'],
             "Percent Null": f"{df[column].isnull().mean() * 100:.2f}%",
             "Statistics": ', '.join([f"{k}: {', '.join(map(str, v))}" if isinstance(v, tuple) else f"{k}: {v}" for k, v in column_info.items() if k != 'examples']),
-            "Status": definitions.get(column, {}).get("status", "added"),
-            "Priority": definitions.get(column, {}).get("priority", "1")
+            "Status": definitions.get(column, {}).get("status", "added")
         }
         # Add any additional custom fields from the YAML file
         for key, value in definitions.get(column, {}).items():
