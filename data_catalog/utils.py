@@ -13,7 +13,13 @@ def load_definitions(path_to_yaml):
 def generate_initial_yaml(df, path_to_yaml):
     if not os.path.exists(path_to_yaml):
         with open(path_to_yaml, 'w') as file:
-            yaml.safe_dump({col: {"source": "TBD", "definition": "No definition provided"} for col in df.columns}, file)
+            yaml.safe_dump({
+                col: {
+                    "source": "TBD",
+                    "definition": "No definition provided",
+                    "status": "added"
+                } for col in df.columns
+            }, file)
 
 def get_example_values(column):
     info = {}
