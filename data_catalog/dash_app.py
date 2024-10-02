@@ -21,7 +21,6 @@ def edit_definitions(df, path_to_yaml=None):
     columns_to_keep = ['Field Name', 'Data Type', 'Source', 'Definition', 'Status', 'Example Values', 'Percent Null', 'Statistics']
     catalog_df = catalog_df[columns_to_keep]
     
-    # Set default value for Status if it's empty
     catalog_df['Status'] = catalog_df['Status'].fillna('to be added')
 
     app.layout = html.Div([
@@ -60,7 +59,8 @@ def edit_definitions(df, path_to_yaml=None):
             html.Button('Add Column', id='add-column-button', n_clicks=0),
         ]),
         html.Button('Save Changes', id='save-button', n_clicks=0),
-        html.Div(id='save-confirm')
+        html.Div(id='save-confirm'),
+        dcc.Interval(id='auto-save-interval', interval=1000, n_intervals=0)  # Auto-save every 10 seconds
     ])
 
     @app.callback(
@@ -95,24 +95,33 @@ def edit_definitions(df, path_to_yaml=None):
     @app.callback(
         Output('save-confirm', 'children'),
         Input('save-button', 'n_clicks'),
-        State('data-catalog-table', 'data'),
-        State('data-catalog-table', 'columns')
+        Input('auto-save-interval', 'n_intervals'),
+        Input('data-catalog-table', 'data'),
+        Input('data-catalog-table', 'columns'),
+        State('save-confirm', 'children')
     )
-    def update_definitions(n_clicks, rows, columns):
-        if n_clicks > 0:
-            new_definitions = {}
-            for row in rows:
-                field_name = row['Field Name']
-                new_definitions[field_name] = {}
-                for col in columns:
-                    if col['name'] not in ['Field Name', 'Data Type', 'Example Values', 'Percent Null', 'Statistics']:
-                        # Use lowercase keys for consistency
-                        key = col['name'].lower()
-                        new_definitions[field_name][key] = row.get(col['id'], '')
-            
-            with open(path_to_yaml, 'w') as file:
-                yaml.safe_dump(new_definitions, file)
-            return 'Changes saved!'
-        return ''
+    def save_changes(manual_save_clicks, auto_save_intervals, rows, columns, previous_message):
+        ctx = callback_context
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if not ctx.triggered or (triggered_id == 'auto-save-interval' and previous_message == 'Auto-saved!'):
+            return previous_message
+
+        new_definitions = {}
+        for row in rows:
+            field_name = row['Field Name']
+            new_definitions[field_name] = {}
+            for col in columns:
+                if col['name'] not in ['Field Name', 'Data Type', 'Example Values', 'Percent Null', 'Statistics']:
+                    key = col['name'].lower()
+                    new_definitions[field_name][key] = row.get(col['id'], '')
+        
+        with open(path_to_yaml, 'w') as file:
+            yaml.safe_dump(new_definitions, file)
+        
+        if triggered_id == 'save-button':
+            return 'Changes saved manually!'
+        else:
+            return 'Auto-saved!'
 
     app.run_server(debug=False)
